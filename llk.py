@@ -90,3 +90,9 @@ class LLKParserWrapped(IParser):
         if ret is None:
             return False
         return True
+        
+    def parse(self, s : str) -> List[Rule]:
+        ret = LLKParser(s, self.grammar, self.table, self.order, self.k)
+        if ret is None:
+            return []
+        return [self.order[x] for x in ret]
