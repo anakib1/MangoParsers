@@ -10,8 +10,8 @@ class ParserTest(unittest.TestCase):
         grammar = Grammar.read(['S -> BA', 'A -> +BA | eps', 'B -> DC', 'C -> *DC | eps', 'D -> (S) | a'])
         parser = RecursiveParser(grammar)
         self.assertTrue(parser.verify('(a+a)*a'))
-        self.assertTrue(parser.verify('a+a'))
         self.assertTrue(parser.verify('a'))
+        self.assertTrue(parser.verify('a+a'))
         self.assertFalse(parser.verify('abc'))
 
 

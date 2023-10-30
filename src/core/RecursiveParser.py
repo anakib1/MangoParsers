@@ -6,12 +6,15 @@ class RecursiveParser(IParser):
 
     __slots__ = ['rules_by_symbol', 'grammar', 'read', 'unread']
 
-    def __init__(self, grammar:Grammar):
+    def __init__(self, grammar = None):
+        if grammar is not None:
+            self.init(grammar) 
+
+    def init(self, grammar : Grammar):
         self.grammar = grammar.remove_eps_rules()
         self.rules_by_symbol = {}
         for rule in self.grammar.rules:
             self.rules_by_symbol[rule.st] = self.rules_by_symbol.setdefault(rule.st, []) + [rule]
-        self.grammar = grammar
 
 
     def is_compatible(self, rule : Rule):
@@ -28,12 +31,12 @@ class RecursiveParser(IParser):
 
 
     def try_parse(self) -> bool:
-        if len(self.input) == 0:
-            return len(self.parse_stack) == 1 and self.parse_stack[0] == self.grammar.start_symbol
+        if len(self.input) == 0 and len(self.parse_stack) == 1 and self.parse_stack[0] == self.grammar.start_symbol:
+            return True
         
         moves = []
-        for rule in self.grammar:
-            if self.is_compatible(rule, self.parse_stack):
+        for rule in self.grammar.rules:
+            if self.is_compatible(rule):
                 moves.append((1, rule))
         if len(self.input) > 0:
             moves.append((2, 'reduce'))
@@ -41,7 +44,7 @@ class RecursiveParser(IParser):
         for move in moves:
             saved_moment = deepcopy((self.parse_stack, self.input))
             if move[0] == 2:
-                self.parse_stack.append(self.input[0])
+                self.parse_stack.append(SymbolUtils.getSymbol(self.input[0]))
                 self.input = self.input[1:]
                 if (self.try_parse()):
                     return True
