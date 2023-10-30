@@ -1,0 +1,5 @@
+S->BA
+A->+BA|eps
+B->DC
+C->*DC|eps
+D->(S)|a

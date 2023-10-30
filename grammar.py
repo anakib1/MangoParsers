@@ -39,8 +39,11 @@ class Terminal(BaseSymbol):
     """
 
     def __init__(self, symbol : str) -> None:
-        assert symbol.islower(), 'terminals MUST be lowercase'
+        assert symbol.islower() or not symbol.isalpha(), 'terminals MUST be lowercase'
         super().__init__(symbol)
+    
+    def isEpsilon(self):
+        return self.symbol == "[eps]"
 
 class SymbolUtils:
     @staticmethod
@@ -90,7 +93,7 @@ class Grammar:
         self.rules = deepcopy(rules)
 
     @staticmethod
-    def read(f : Union[TextIO, List[str]]) -> Grammar:
+    def read(f : Union[TextIO, List[str]]):
         """
         Expects input of form
         A -> BcD | e | zz | EPS 
@@ -98,7 +101,7 @@ class Grammar:
         THIS INPUT SHOULD NOT CONTAIN MAYBE PRODUCED NonTerms LIKE [Abb1]
         """
         if not isinstance(f, List):
-            f = f.readlines()
+            f = [x.strip() for x in f.readlines()]
 
         vocab = set()
         rules = []
@@ -112,14 +115,16 @@ class Grammar:
             end_list = end.split('|')
             for rule_part in end_list:
                 rule_part_end = []
-                for word in rule_part:
-                    vocab.add(SymbolUtils.getSymbol(word))
-                    rule_part_end.add(SymbolUtils.getSymbol(word))
-                rules.append(Rule(st, rule_part_end))
+                if rule_part == "eps":
+                    rule_part_end.append(Terminal("eps"))
+                else:
+                    for word in rule_part:
+                        vocab.add(SymbolUtils.getSymbol(word))
+                        rule_part_end.append(SymbolUtils.getSymbol(word))
+                rules.append(Rule(NonTerminal(st), rule_part_end))
             
         return Grammar(
-                [x for x in vocab if isinstance(x, NonTerminal)], 
-                [x for x in vocab if isinstance(x, Terminal)],
-                rules
+                set([x for x in vocab if isinstance(x, NonTerminal)]), 
+                set([x for x in vocab if isinstance(x, Terminal)]),
+                set(rules)
             )
-
