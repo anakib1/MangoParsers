@@ -18,17 +18,23 @@ def KconcatenateTwostrings(str1: Tuple[Terminal], str2: Tuple[Terminal], k: int)
     """
     this function k-concatenates two k-terminal strings
     """
-    if str1[0].isEpsilon():
+    if not str1 or str1[0].isEpsilon():
         str1 = tuple()
-    if str2[0].isEpsilon():
+    if not str2 or str2[0].isEpsilon():
         str2 = tuple()
-    return tuple(list(str1) + list(str2[0:max(0, min(k - len(str1), len(str2)))]))
+    ans =  tuple(list(str1) + list(str2[0:max(0, min(k - len(str1), len(str2)))]))
+    if not ans:
+        return tuple([Terminal("eps")])
+    else:
+        return ans
 
 
 def KconcatenateTwoSets(set1: Set[Tuple[Terminal]], set2: Set[Tuple[Terminal]], k: int) -> Set[Tuple[Terminal]]:
     """
     this function k-concatenates two sets of terminal k-strings
     """
+    if not set1 or not set2:
+        return {tuple([Terminal("eps")])}
     set3 = set()
     for str1 in set1:
         for str2 in set2:
@@ -36,7 +42,7 @@ def KconcatenateTwoSets(set1: Set[Tuple[Terminal]], set2: Set[Tuple[Terminal]], 
     return set3
 
 
-def KconcatenateListOfSets(lst: List[Set[Tuple[Terminal]]], k) -> Set[Tuple[Terminal]]:
+def KconcatenateListOfSets(lst: List[Set[Tuple[Terminal]]], k: int) -> Set[Tuple[Terminal]]:
     """
     this function k-concatenates sets of terminal k-strings
     """
@@ -54,11 +60,13 @@ def firstK(grammar: Grammar, k: int) -> dict[NonTerminal, Set[Tuple[Terminal]]]:
     possible firstk tuples that the NonTerminal can produce
     """
     ans = {
-        nterm : set() 
+        nterm : "-" 
         for nterm in grammar.non_terms
     }
     for rule in grammar.rules:
         if checkNonTerminalRule(rule):
+            if ans[rule.st] == "-":
+                ans[rule.st] = set()
             ans[rule.st].add(tuple(rule.en[:min(len(rule.en), k)]))
     while True:
         stop = True
@@ -69,7 +77,11 @@ def firstK(grammar: Grammar, k: int) -> dict[NonTerminal, Set[Tuple[Terminal]]]:
                     lst.append({tuple([sym])})
                 else:
                     lst.append(ans[sym])
+            if "-" in lst:
+                continue
             new_set = KconcatenateListOfSets(lst, k)
+            if ans[rule.st] == "-":
+                ans[rule.st] = set()
             if not new_set.issubset(ans[rule.st]):
                 stop = False
                 ans[rule.st].update(new_set)
@@ -77,3 +89,46 @@ def firstK(grammar: Grammar, k: int) -> dict[NonTerminal, Set[Tuple[Terminal]]]:
             break
     return ans
 
+
+def sequenceFirstK(seq: Tuple[BaseSymbol], dct: dict[NonTerminal, Set[Tuple[Terminal]]], k: int) -> Set[Tuple[Terminal]]:
+    """
+    return every possible firstK tuples for sequence of termainl and 
+    non-terminal symbols
+    """
+    sets = []
+    for elem in seq:
+        if isinstance(elem, Terminal):
+            sets.append({tuple([elem])})
+        else:
+            sets.append(dct[elem])
+    return KconcatenateListOfSets(sets, k)
+
+
+def followK(grammar: Grammar, k: int):
+    """
+    for every terminal in grammmar returns the set of all 
+    possible firstk tuples that the NonTerminal can produce
+    """
+    ans = {
+        nterm: "-"
+        for nterm in grammar.non_terms
+    }
+    ans[grammar.start_symbol] = {tuple([Terminal("eps")])}
+    while True:
+        stop = True
+        for rule in grammar.rules:
+            for i, sym in enumerate(rule.en):
+                if isinstance(sym, NonTerminal):
+                    if ans[rule.st] == "-":
+                        continue
+                    set1 = sequenceFirstK(tuple(rule.en[i+1:]), firstK(grammar, k), k)
+                    set2 = ans[rule.st]
+                    new_set = KconcatenateTwoSets(set1, set2, k)
+                    if ans[sym] == "-":
+                        ans[sym] = set()
+                    if not new_set.issubset(ans[sym]):
+                        stop = False
+                        ans[sym].update(new_set)
+        if stop:
+            break
+    return ans
