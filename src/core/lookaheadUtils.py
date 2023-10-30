@@ -1,4 +1,4 @@
-from grammar import Grammar, NonTerminal, Terminal, Rule, SymbolUtils, BaseSymbol
+from core.grammar import Grammar, NonTerminal, Terminal, Rule, SymbolUtils, BaseSymbol
 from typing import List, Set, Tuple
 from copy import deepcopy
 

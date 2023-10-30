@@ -33,6 +33,9 @@ class NonTerminal(BaseSymbol):
         assert symbol[0].isupper(), 'nonterminals should start from uppercase characters'
         super().__init__(symbol)
 
+    def isEpsilon(self):
+        return False
+
 class Terminal(BaseSymbol):
     """
     Symbols that are terminal
@@ -81,6 +84,21 @@ class Rule:
     def __repr__(self) -> str :
         return f'{self.st} -> {[str(x) for x in self.en] if len(self.en) > 0 else "EPS"}'
 
+    def isEpsilon(self, bad_set : Set ) -> bool:
+        return self.en[0].isEpsilon() or len(list(filter(lambda x : x not in bad_set, self.en))) == 0
+    
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Rule): return False 
+        if len(self.en) != len(other.en): return False
+        for i, x in enumerate(self.en):
+            if x != other.en[i]:
+                return False 
+        return self.st == other.st
+    
+    def __hash__(self):
+        return hash(str(self.st) + '->' + ''.join(str(x) for x in self.en))
+    
+
 
 class Grammar:
     vocab : Set[BaseSymbol]
@@ -115,8 +133,6 @@ class Grammar:
 
         vocab = set()
         rules = []
-        terms = []
-        nonterms = []
         for line in f: 
             line = line.replace(' ', '')
             st, end = line.split('->')
@@ -138,3 +154,52 @@ class Grammar:
                 set([x for x in vocab if isinstance(x, Terminal)]),
                 set(rules)
             )
+
+
+    def find_creatures(self):
+        bad_set = set()
+
+        while True:
+            start_size = len(bad_set)
+            for rule in self.rules:
+                if rule.isEpsilon(bad_set):
+                    bad_set.add(rule.st)
+
+            if start_size == len(bad_set):
+                break
+    
+
+        return list(bad_set)
+
+    def remove_eps_rules(self):
+        creatures = self.find_creatures()
+        ret = Grammar(set(), set(), [])
+        for rule in self.rules:
+            creatures_in_rule = [x for x in range(len(rule.en)) if rule.en[x] in creatures]
+            ln = len(creatures_in_rule)
+            for mask in range(1 << ln):
+                nf = []
+                for i in range(len(rule.en)):
+                    if i in creatures_in_rule:
+                        pos = creatures_in_rule.index(i)
+                        if mask & 1 << pos:
+                            nf.append(copy(rule.en[i]))
+                    else:
+                        nf.append(copy(rule.en[i]))
+                rule_to_add = Rule(copy(rule.st), nf)
+                if not rule_to_add.isEpsilon(set()):
+                    ret.add_rule(rule_to_add)
+        return ret
+
+    def add_rule(self, rule:Rule):
+        for other in self.rules:
+            if other == rule:
+                return
+        for x in [rule.st] + rule.en:
+            if not x in self.vocab:
+                self.vocab.add(copy(x))
+                if isinstance(x, Terminal):
+                    self.terms.add(copy(x))
+                else:
+                    self.non_terms.add(copy(x))
+        self.rules.append(rule)
