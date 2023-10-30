@@ -41,6 +41,9 @@ class Terminal(BaseSymbol):
     def __init__(self, symbol : str) -> None:
         assert symbol.islower() or not symbol.isalpha(), 'terminals MUST be lowercase'
         super().__init__(symbol)
+    
+    def isEpsilon(self):
+        return self.symbol == "[eps]"
 
 class SymbolUtils:
     @staticmethod
@@ -118,7 +121,7 @@ class Grammar:
                     for word in rule_part:
                         vocab.add(SymbolUtils.getSymbol(word))
                         rule_part_end.append(SymbolUtils.getSymbol(word))
-                rules.append(Rule(st, rule_part_end))
+                rules.append(Rule(NonTerminal(st), rule_part_end))
             
         return Grammar(
                 set([x for x in vocab if isinstance(x, NonTerminal)]), 
