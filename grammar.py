@@ -90,7 +90,7 @@ class Grammar:
         self.rules = deepcopy(rules)
 
     @staticmethod
-    def read(f : Union[TextIO, List[str]]) -> Grammar:
+    def read(f : Union[TextIO, List[str]]):
         """
         Expects input of form
         A -> BcD | e | zz | EPS 
@@ -123,3 +123,30 @@ class Grammar:
                 rules
             )
 
+
+class BaseTerminalString:
+    """
+    String of NonTerminal characters
+    """
+    def __init__(self, symbols: List[BaseSymbol]) -> None:
+        self.symbols = symbols
+        self.length = len(symbols)
+    
+    def __repr__(self) -> str:
+        ans = ""
+        for sym in self.symbols:
+            ans += sym.__repr__()
+        return ans
+
+    def __eq__(self, other : object) -> bool:
+        if not isinstance(other, BaseTerminalString):
+            return False
+        if self.length != other.length:
+            return False
+        for i in range(self.length):
+            if not self.symbols[i].__eq__(other.symbols[i]):
+                return False
+        return True
+
+    def __hash__(self) -> int:
+        return hash(tuple(self.symbols))
