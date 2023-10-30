@@ -80,6 +80,9 @@ class Rule:
 
     def __repr__(self) -> str :
         return f'{self.st} -> {[str(x) for x in self.en] if len(self.en) > 0 else "EPS"}'
+        
+    def __str__(self) -> str:
+        return f"{self.st} -> {''.join([str(x) for x in self.en] if len(self.en) > 0 else '[eps]')}"
 
 
 class Grammar:
