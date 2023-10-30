@@ -1,7 +1,7 @@
 from lookaheadUtils import followK, firstK, sequenceFirstK, KconcatenateTwoSets
 from grammar import Grammar, Terminal, NonTerminal, Rule
 from typing import Tuple, List, Dict
-
+from iparser import IParser
 
 def buildLLKTable(grammar: Grammar, k: int):
     """
@@ -75,4 +75,18 @@ def LLKParser(string: str, grammar: Grammar, table: Dict[NonTerminal, Dict[Tuple
         print(f"Synthax error near {pos} symbol")
         return None
     return sequence
-    
+
+class LLKParserWrapped(IParser):
+
+    def __init__(self, k = 5):
+        self.k = k 
+
+    def init(self, grammar:Grammar) -> None:
+        self.grammar = grammar 
+        self.table, self.order = buildLLKTable(grammar, self.k)
+
+    def verify(self, s: str) -> bool:
+        ret = LLKParser(s, self.grammar, self.table, self.order, self.k)
+        if ret is None:
+            return False
+        return True
