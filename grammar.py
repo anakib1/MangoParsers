@@ -39,7 +39,7 @@ class Terminal(BaseSymbol):
     """
 
     def __init__(self, symbol : str) -> None:
-        assert symbol.islower(), 'terminals MUST be lowercase'
+        assert symbol.islower() or not symbol.isalpha(), 'terminals MUST be lowercase'
         super().__init__(symbol)
 
 class SymbolUtils:
@@ -98,7 +98,7 @@ class Grammar:
         THIS INPUT SHOULD NOT CONTAIN MAYBE PRODUCED NonTerms LIKE [Abb1]
         """
         if not isinstance(f, List):
-            f = f.readlines()
+            f = [x.strip() for x in f.readlines()]
 
         vocab = set()
         rules = []
@@ -112,41 +112,16 @@ class Grammar:
             end_list = end.split('|')
             for rule_part in end_list:
                 rule_part_end = []
-                for word in rule_part:
-                    vocab.add(SymbolUtils.getSymbol(word))
-                    rule_part_end.add(SymbolUtils.getSymbol(word))
+                if rule_part == "eps":
+                    rule_part_end.append(Terminal("eps"))
+                else:
+                    for word in rule_part:
+                        vocab.add(SymbolUtils.getSymbol(word))
+                        rule_part_end.append(SymbolUtils.getSymbol(word))
                 rules.append(Rule(st, rule_part_end))
             
         return Grammar(
-                [x for x in vocab if isinstance(x, NonTerminal)], 
-                [x for x in vocab if isinstance(x, Terminal)],
-                rules
+                set([x for x in vocab if isinstance(x, NonTerminal)]), 
+                set([x for x in vocab if isinstance(x, Terminal)]),
+                set(rules)
             )
-
-
-class BaseTerminalString:
-    """
-    String of NonTerminal characters
-    """
-    def __init__(self, symbols: List[BaseSymbol]) -> None:
-        self.symbols = symbols
-        self.length = len(symbols)
-    
-    def __repr__(self) -> str:
-        ans = ""
-        for sym in self.symbols:
-            ans += sym.__repr__()
-        return ans
-
-    def __eq__(self, other : object) -> bool:
-        if not isinstance(other, BaseTerminalString):
-            return False
-        if self.length != other.length:
-            return False
-        for i in range(self.length):
-            if not self.symbols[i].__eq__(other.symbols[i]):
-                return False
-        return True
-
-    def __hash__(self) -> int:
-        return hash(tuple(self.symbols))
