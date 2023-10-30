@@ -13,3 +13,5 @@ print("-----------------------")
 follow = followK(grammar, 1)
 for key, val in follow.items():
     print(key, val)
+
+print("llk")
