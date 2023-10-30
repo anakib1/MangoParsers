@@ -3,6 +3,11 @@ from typing import Dict, List
 
 
 def generateString(grammar: Grammar, ordering: Dict[int, Rule], sequence: List[int]) -> List[Terminal]:
+    """
+    The function that generates a tuple of terminal strings
+    given the sequence of rules in the grammar
+    It returnes None if there is a problem during string generation
+    """
     mas = [grammar.start_symbol]
     for pos, rule_num in enumerate(sequence):
         pos = -1
