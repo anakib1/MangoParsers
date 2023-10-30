@@ -1,5 +1,5 @@
 from grammar import Grammar, NonTerminal, Terminal, Rule, SymbolUtils, BaseSymbol
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Dict
 from copy import deepcopy
 
 
@@ -47,14 +47,14 @@ def KconcatenateListOfSets(lst: List[Set[Tuple[Terminal]]], k: int) -> Set[Tuple
     this function k-concatenates sets of terminal k-strings
     """
     if not lst:
-        return set()
+        return {tuple([Terminal("eps")])}
     ans = lst[0]
     for i in range(1, len(lst)):
         ans = KconcatenateTwoSets(ans, lst[i], k)
     return ans
 
 
-def firstK(grammar: Grammar, k: int) -> dict[NonTerminal, Set[Tuple[Terminal]]]:
+def firstK(grammar: Grammar, k: int) -> Dict[NonTerminal, Set[Tuple[Terminal]]]:
     """
     for every terminal in grammmar returns the set of all 
     possible firstk tuples that the NonTerminal can produce
@@ -90,7 +90,7 @@ def firstK(grammar: Grammar, k: int) -> dict[NonTerminal, Set[Tuple[Terminal]]]:
     return ans
 
 
-def sequenceFirstK(seq: Tuple[BaseSymbol], dct: dict[NonTerminal, Set[Tuple[Terminal]]], k: int) -> Set[Tuple[Terminal]]:
+def sequenceFirstK(seq: Tuple[BaseSymbol], dct: Dict[NonTerminal, Set[Tuple[Terminal]]], k: int) -> Set[Tuple[Terminal]]:
     """
     return every possible firstK tuples for sequence of termainl and 
     non-terminal symbols
