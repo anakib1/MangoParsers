@@ -51,6 +51,15 @@ class SymbolUtils:
         if s[0].isupper():
             return NonTerminal(s)
         return Terminal(s)
+    
+    @staticmethod 
+    def getSymbols(s : str) -> List[BaseSymbol]:
+        """
+        Returns tuple of symbols.
+        """
+        if s == 'eps':
+            return tuple([SymbolUtils.getSymbol('eps')])
+        return tuple(SymbolUtils.getSymbol(x) for x in s)
 
 
 class Rule:
