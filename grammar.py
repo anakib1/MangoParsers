@@ -95,11 +95,12 @@ class Grammar:
     you should not store references to returned values. 
     """
 
-    def __init__ (self, nonterminals : Set[NonTerminal], terminals : Set[Terminal], rules : Set[Rule]) -> None:
+    def __init__ (self, nonterminals : Set[NonTerminal], terminals : Set[Terminal], rules : Set[Rule], start_symbol=NonTerminal("S")) -> None:
         self.terms = deepcopy(terminals)
         self.non_terms = deepcopy(nonterminals)
         self.vocab = self.terms | self.non_terms
         self.rules = deepcopy(rules)
+        self.start_symbol = start_symbol
 
     @staticmethod
     def read(f : Union[TextIO, List[str]]):
