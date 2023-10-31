@@ -1,6 +1,7 @@
 from core.iparser import IParser
 from core.grammar import Terminal, NonTerminal, BaseSymbol, Grammar, SymbolUtils, Rule
 from copy import deepcopy
+from typing import List
 
 class RecursiveParser(IParser):
 
@@ -39,7 +40,7 @@ class RecursiveParser(IParser):
             if self.is_compatible(rule):
                 moves.append((1, rule))
         if len(self.input) > 0:
-            moves.append((2, 'reduce'))
+            moves.append((2, 'shift'))
 
         for move in moves:
             saved_moment = deepcopy((self.parse_stack, self.input))
@@ -50,21 +51,29 @@ class RecursiveParser(IParser):
                     return True
             else:
                 self.reduce(move[1])
+                sz = len(self.move_stack)
                 if (self.try_parse()):
+                    self.move_stack = self.move_stack[:sz]  + [deepcopy(move[1])] + self.move_stack[sz:]
                     return True
-            
+
             self.parse_stack, self.input = saved_moment
         
         return False
                     
-
-
-
-
     def verify(self, s : str) -> bool:
         self.parse_stack = []
         self.input = s
+        self.move_stack = []
         return self.try_parse()
+
+    def parse(self, s : str) -> List[Rule]:
+        if not self.verify(s):
+            return []
+        ret = self.move_stack[::-1]
+        for x in ret:
+           x.en = x.en[::-1]
+        return ret
+
 
 
 
