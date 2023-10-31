@@ -1,13 +1,13 @@
 import unittest
 
-from grammar import Grammar, SymbolUtils
-from llk import LLKParserWrapped
+from core.grammar import Grammar, SymbolUtils
+from core.RecursiveParser import RecursiveParser
 from typing import Set
 
 class ParserTest(unittest.TestCase):
     def testParserLL1(self):
         grammar = Grammar.read(['S -> BA', 'A -> +BA | eps', 'B -> DC', 'C -> *DC | eps', 'D -> (S) | a'])
-        parser = LLKParserWrapped(1)
+        parser = RecursiveParser()
         parser.init(grammar)
 
         self.assertTrue(parser.verify('(a+a)*a'))
@@ -17,7 +17,7 @@ class ParserTest(unittest.TestCase):
 
     def testParserLL2(self):
         grammar = Grammar.read(['S -> aaA', 'A -> aAc | bBc', 'B -> bBc | bc'])
-        parser = LLKParserWrapped(2)
+        parser = RecursiveParser()
         parser.init(grammar)
 
         # n = 2, m = 5
@@ -26,7 +26,7 @@ class ParserTest(unittest.TestCase):
 
     def testParserLL3(self):
         grammar = Grammar.read(['S -> aSA', 'S -> eps', 'A -> aabS | c'])
-        parser = LLKParserWrapped(3)
+        parser = RecursiveParser()
         parser.init(grammar)
 
         self.assertTrue(parser.verify('aaab'))
@@ -35,7 +35,7 @@ class ParserTest(unittest.TestCase):
 
     def testParserLL3Again(self):
         grammar = Grammar.read(['S -> aaB | aaC', 'B -> b', 'C -> c'])
-        parser = LLKParserWrapped(3)
+        parser = RecursiveParser()
         parser.init(grammar)
 
         self.assertTrue(parser.verify('aab'))

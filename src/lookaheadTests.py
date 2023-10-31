@@ -1,8 +1,8 @@
 import unittest
 
-from grammar import Grammar, SymbolUtils
+from core.grammar import Grammar, SymbolUtils
 from typing import Set
-import lookaheadUtils
+from core.lookaheadUtils import lookaheadUtils
 
 class LookaheadUtilsTest(unittest.TestCase):
     def checkSets(self, a : Set, b : Set):

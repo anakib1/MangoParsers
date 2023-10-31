@@ -1,6 +1,6 @@
-from grammar import Grammar, Terminal, NonTerminal, BaseSymbol, Rule
+from core.grammar import Grammar, Terminal, NonTerminal, BaseSymbol, Rule
 from typing import List, Tuple
-from llk import LLKParserWrapped
+from core.llk import LLKParserWrapped
 import graphviz
 
 class Visualiser:
@@ -42,12 +42,4 @@ class Visualiser:
 
         self.dot.render('dot', format='png', view=True)
 
-grammar = Grammar.read(['S -> BA', 'A -> +BA | eps', 'B -> DC', 'C -> *DC | eps', 'D -> (S) | a'])
-parser = LLKParserWrapped(1)
-parser.init(grammar)
-
-order = parser.parse('(a+a)*a')
-
-drawer = Visualiser()
-drawer.draw(order)
 

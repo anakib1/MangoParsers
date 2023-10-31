@@ -1,7 +1,7 @@
-from lookaheadUtils import followK, firstK, sequenceFirstK, KconcatenateTwoSets
-from grammar import Grammar, Terminal, NonTerminal, Rule
+from core.lookaheadUtils import lookaheadUtils
+from core.grammar import Grammar, Terminal, NonTerminal, Rule
 from typing import Tuple, List, Dict
-from iparser import IParser
+from core.iparser import IParser
 
 def buildLLKTable(grammar: Grammar, k: int):
     """
@@ -14,8 +14,8 @@ def buildLLKTable(grammar: Grammar, k: int):
     
     The function returns None if the grammar is not strong LL(k)
     """
-    first = firstK(grammar, k)
-    follow = followK(grammar, k)
+    first = lookaheadUtils.firstK(grammar, k)
+    follow = lookaheadUtils.followK(grammar, k)
     ordering = dict()
     reverse_ordering = dict()
     for i, rule in enumerate(grammar.rules):
@@ -23,9 +23,9 @@ def buildLLKTable(grammar: Grammar, k: int):
         reverse_ordering[i] = rule
     sets = dict()
     for rule in grammar.rules:
-        set1 = sequenceFirstK(rule.en, first, k)
+        set1 = lookaheadUtils.sequenceFirstK(rule.en, first, k)
         set2 = follow[rule.st]
-        sets[rule] = KconcatenateTwoSets(set1, set2, k)
+        sets[rule] = lookaheadUtils.KconcatenateTwoSets(set1, set2, k)
     ans = {
         nterm: dict()
         for nterm in grammar.non_terms

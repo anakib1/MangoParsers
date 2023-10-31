@@ -1,4 +1,4 @@
-from grammar import Grammar, Rule, Terminal, NonTerminal
+from core.grammar import Grammar, Rule, Terminal, NonTerminal
 from typing import Dict, List
 
 

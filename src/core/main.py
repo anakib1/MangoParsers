@@ -1,7 +1,7 @@
 from grammar import Terminal, NonTerminal, Rule, BaseSymbol, Grammar
 from lookaheadUtils import firstK, followK
-from llk import buildLLKTable, LLKParser
-from grammarGenerator import generateString
+from src.core.llk import buildLLKTable, LLKParser
+from src.core.grammarGenerator import generateString
 
 
 grammar = Grammar.read(open("./gram.txt", "r"))

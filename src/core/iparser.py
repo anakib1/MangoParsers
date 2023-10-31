@@ -1,5 +1,5 @@
 from typing import Union, TextIO, List
-from grammar import Grammar, Rule
+from core.grammar import Grammar, Rule
 
 class IParser:
     """
