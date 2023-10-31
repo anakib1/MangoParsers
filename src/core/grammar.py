@@ -83,6 +83,9 @@ class Rule:
 
     def __repr__(self) -> str :
         return f'{self.st} -> {[str(x) for x in self.en] if len(self.en) > 0 else "EPS"}'
+        
+    def __str__(self) -> str:
+        return f"{self.st} -> {''.join([str(x) for x in self.en] if len(self.en) > 0 else '[eps]')}"
 
     def isEpsilon(self, bad_set : Set ) -> bool:
         return self.en[0].isEpsilon() or len(list(filter(lambda x : x not in bad_set, self.en))) == 0

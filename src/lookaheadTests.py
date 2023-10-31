@@ -2,7 +2,7 @@ import unittest
 
 from core.grammar import Grammar, SymbolUtils
 from typing import Set
-from core import lookaheadUtils
+from core.lookaheadUtils import lookaheadUtils
 
 class LookaheadUtilsTest(unittest.TestCase):
     def checkSets(self, a : Set, b : Set):
